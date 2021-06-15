@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "710929240559",
+    "firebase_url": "https://wecook-5ab29-default-rtdb.firebaseio.com",
+    "project_id": "wecook-5ab29",
+    "storage_bucket": "wecook-5ab29.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:710929240559:android:abd8d950b9dc23dff7e61a",
+        "android_client_info": {
+          "package_name": "com.wecook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "710929240559-36oflt44igobe30mhdvvpm223no1m8uf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wecook",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "710929240559-a4tl5mfetk0t06rk3k98k1qvee5bdqmo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNAOiwUoBHRyD0fkZjGIUHbxoLsAsPlOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "710929240559-a4tl5mfetk0t06rk3k98k1qvee5bdqmo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

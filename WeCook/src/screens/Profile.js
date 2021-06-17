@@ -4,18 +4,49 @@ import LinearGradient from 'react-native-linear-gradient';
 import EditIcon from 'react-native-vector-icons/EvilIcons';
 import Menu from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
-import PagerView from 'react-native-pager-view';
+import {TabView, SceneMap} from 'react-native-tab-view';
 
 import {profileStyle} from '../styles/profileStyle';
 import {AuthContext} from '../routes/AuthProvider';
-import {ProfileModal} from '../components/ProfileModal';
 import {ImgGrid} from '../components/ImgGrid';
+import {renderTabBar} from '../components/TabBar';
 
 export default function Profile({navigation, route}) {
-  const {user, logout} = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   const [posts, setPosts] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const PostRoute = () => {
+    return (
+      <View style={{flex: 1}}>
+        <FlatList
+          data={posts}
+          renderItem={({item}) => (
+            <ImgGrid item={item} navigation={navigation} />
+          )}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          numColumns={3}
+        />
+      </View>
+    );
+  };
+
+  const SaveRoute = () => {
+    return <View style={{flex: 1, backgroundColor: '#673ab7'}} />;
+  };
+
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState([
+    {key: 'first', title: 'Posts'},
+    {key: 'second', title: 'Saved'},
+  ]);
+
+  const renderScene = SceneMap({
+    first: PostRoute,
+    second: SaveRoute,
+  });
 
   const fetchPosts = async () => {
     try {
@@ -67,7 +98,7 @@ export default function Profile({navigation, route}) {
 
   useEffect(() => {
     fetchPosts();
-  }, [])
+  }, []);
 
   useEffect(() => {
     getUser();
@@ -125,11 +156,20 @@ export default function Profile({navigation, route}) {
         </View>
       </LinearGradient>
       <View style={profileStyle.footer}>
-        <PagerView style={styles.pagerView} initialPage={0}>
+        <TabView
+          navigationState={{index, routes}}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{width: '100%'}}
+          renderTabBar={renderTabBar}
+        />
+        {/* <PagerView style={styles.pagerView} initialPage={0}>
           <View key="1">
             <FlatList
               data={posts}
-              renderItem={({item}) => <ImgGrid item={item} />}
+              renderItem={({item}) => (
+                <ImgGrid item={item} navigation={navigation} />
+              )}
               keyExtractor={item => item.id}
               showsVerticalScrollIndicator={false}
               numColumns={3}
@@ -138,7 +178,7 @@ export default function Profile({navigation, route}) {
           <View key="2">
             <Text>Second page</Text>
           </View>
-        </PagerView>
+        </PagerView> */}
       </View>
     </View>
   );

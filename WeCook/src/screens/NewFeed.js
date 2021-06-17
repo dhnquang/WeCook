@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {View, Text, FlatList, Alert} from 'react-native';
 import Menu from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
@@ -7,12 +7,14 @@ import storage from '@react-native-firebase/storage';
 import {feedStyle} from '../styles/feedStyle';
 import {Post} from '../components/Post';
 import {LoadingNewFeed} from '../components/LoadingNewFeed';
+import { AuthContext } from '../routes/AuthProvider';
 
 export default function NewFeed({navigation}) {
   const [posts, setPosts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const {user} = useContext(AuthContext)
 
   const fetchPosts = async () => {
     try {
@@ -78,7 +80,7 @@ export default function NewFeed({navigation}) {
   };
 
   const deletePost = postId => {
-    console.log('Current Post Id: ', postId);
+    // console.log('Current Post Id: ', postId);
     firestore()
       .collection('Posts')
       .doc(postId)
@@ -91,7 +93,7 @@ export default function NewFeed({navigation}) {
           imageRef
             .delete()
             .then(() => {
-              console.log(`${postImg} has been deleted`);
+              // console.log(`${postImg} has been deleted`);
               deleteFirestoreData(postId);
               setDeleted(true);
             })
@@ -105,7 +107,7 @@ export default function NewFeed({navigation}) {
   const handleRefresh = () => {
     setRefresh(true);
     fetchPosts();
-  }
+  };
 
   const deleteFirestoreData = postId => {
     firestore()
@@ -129,7 +131,7 @@ export default function NewFeed({navigation}) {
           name="menu"
           size={30}
           onPress={() => navigation.openDrawer()}
-          style={{alignSelf: 'center'}}
+          style={{alignSelf: 'center', marginLeft: '1%'}}
         />
         <Text style={feedStyle.header}> Food Recipe</Text>
       </View>
@@ -140,11 +142,18 @@ export default function NewFeed({navigation}) {
           style={feedStyle.footer}
           data={posts}
           renderItem={({item}) => (
-            <Post item={item} navigation={navigation} onPress={() => navigation.navigate('HomeProfile', {uID: item.uID})} onDelete={handleDelete} />
+            <Post
+              item={item}
+              navigation={navigation}
+              onPress={() =>
+                navigation.navigate('HomeProfile', {uID: item.uID})
+              }
+              onDelete={handleDelete}
+            />
           )}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
-          refreshing={ refresh}
+          refreshing={refresh}
           onRefresh={handleRefresh}
         />
       )}

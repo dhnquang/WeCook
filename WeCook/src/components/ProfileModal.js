@@ -19,7 +19,7 @@ import {profileStyle} from '../styles/profileStyle';
 import {AuthContext} from '../routes/AuthProvider';
 
 export const ProfileModal = ({navigation}) => {
-  const {user} = useContext(AuthContext);
+  const {user, logout} = useContext(AuthContext);
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
   const [image, setImage] = useState(null);
@@ -255,6 +255,9 @@ export const ProfileModal = ({navigation}) => {
               onChangeText={txt => setUserData({...userData, Bio: txt})}
             />
           </View>
+          <TouchableOpacity onPress={logout} style={profileStyle.logoutButton}>
+            <Text style={profileStyle.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
     </View>

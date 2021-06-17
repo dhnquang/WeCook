@@ -16,7 +16,7 @@ import {LoginInput} from '../components/InputText';
 import {AuthContext} from '../routes/AuthProvider';
 
 export default function Login({navigation}) {
-  const {login, googleLogin, facebookLogin} = useContext(AuthContext);
+  const {login, googleLogin, facebookLogin, reset} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -52,7 +52,7 @@ export default function Login({navigation}) {
             isSecurity={true}
           />
           <View style={loginStyle.textBox}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => reset(email)}>
               <Text style={loginStyle.text}>Forget password ?</Text>
             </TouchableOpacity>
           </View>

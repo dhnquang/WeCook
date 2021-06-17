@@ -9,11 +9,69 @@ import {AuthContext} from '../routes/AuthProvider';
 import {postDetailStyle} from '../styles/postDetailStyle';
 
 export default function DetailRecipe({route}) {
+  const [count, setCount] = useState(0);
+  const [userLike, setUserLike] = useState([]);
   const {user} = useContext(AuthContext);
   const [like, setLike] = useState(false);
   const [save, setSave] = useState(false);
   const [post, setPost] = useState(null);
   const [users, setUsers] = useState(null);
+
+  const handleLike = () => {
+    if (userLike.includes(user.uid)) {
+      submitDisLike();
+      return true;
+    } else {
+      submitLike();
+      return false;
+    }
+  };
+
+  const submitLike = async () => {
+    firestore()
+      .collection('Posts')
+      .doc(route.params.id)
+      .update({
+        UserLikes: firestore.FieldValue.arrayUnion(user.uid),
+      })
+      .then(() => {
+        console.log('user like update');
+      })
+      .catch(e => console.log(e));
+    await CountLike();
+  };
+
+  const submitDisLike = async () => {
+    firestore()
+      .collection('Posts')
+      .doc(route.params.id)
+      .update({
+        UserLikes: firestore.FieldValue.arrayRemove(user.uid),
+      })
+      .then(() => {
+        console.log('user like remove');
+      })
+      .catch(e => console.log(e));
+    await CountLike();
+  };
+
+  const CountLike = async () => {
+    try {
+      await firestore()
+        .collection('Posts')
+        .doc(route.params.id)
+        .get()
+        .then(documentSnapshot => {
+          // console.log('User exists: ', documentSnapshot.exists);
+          if (documentSnapshot.exists) {
+            setUserLike(documentSnapshot.data().UserLikes);
+            setCount(documentSnapshot.data().UserLikes.length);
+          }
+        });
+    } catch (e) {
+      console.log('Fetch user likes', e);
+    }
+  };
 
   const getPost = async () => {
     await firestore()
@@ -44,6 +102,7 @@ export default function DetailRecipe({route}) {
   useEffect(() => {
     getPost();
     getUser();
+    CountLike();
   }, []);
 
   return (
@@ -71,8 +130,8 @@ export default function DetailRecipe({route}) {
             <Like
               name="heart"
               size={30}
-              onPress={() => setLike(!like)}
-              color={like ? '#D7443E' : 'gray'}
+              onPress={handleLike}
+              color={handleLike ? '#D7443E' : 'gray'}
             />
             <Save
               name="bookmark"
@@ -101,7 +160,7 @@ export default function DetailRecipe({route}) {
             </Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Like name="heart" size={20} color="#D7443E" />
-              <Text style={postDetailStyle.likeText}>19</Text>
+              <Text style={postDetailStyle.likeText}>{count}</Text>
             </View>
           </View>
         </View>

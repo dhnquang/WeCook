@@ -9,6 +9,7 @@ export const feedStyle = StyleSheet.create({
     paddingBottom: 60,
   },
   headerBar: {
+    alignItems:'center',
     flexDirection: 'row',
     borderBottomWidth: 1,
     width: w,

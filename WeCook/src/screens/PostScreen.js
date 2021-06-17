@@ -46,18 +46,18 @@ export default function PostScreen({navigation}) {
   };
 
   const [ingredientLength, setIngredientLength] = useState([1, 2]);
-  const [stepLength, setStepLength] = useState([
-    {
-      id: 1,
-      detail: 'Cook',
-      img: null,
-    },
-    {
-      id: 2,
-      detail: 'test',
-      img: null,
-    },
-  ]);
+  const [stepLength, setStepLength] = useState([1, 2])
+  //   {
+  //     id: 1,
+  //     detail: 'Cook',
+  //     img: null,
+  //   },
+  //   {
+  //     id: 2,
+  //     detail: 'test',
+  //     img: null,
+  //   },
+  // ]);
 
   //Use photo and camera
   const takePhotoFromCamera = () => {
@@ -97,8 +97,9 @@ export default function PostScreen({navigation}) {
         Ration: ration,
         Time: time,
         uID: user.uid,
-        Like: null,
-        Comment: null,
+        Like: 0,
+        Comment: 0,
+        UserLikes: [],
       })
       .then(() => {
         console.log('Data post set');
@@ -168,6 +169,13 @@ export default function PostScreen({navigation}) {
     // console.log(newIngredientLength);
     setIngredientLength(newIngredientLength);
   };
+
+  const addIngredient = () => {
+    const newIngredient = ingredientLength[ingredientLength.length - 1] + 1;
+    // console.log('aaa', newStep);
+    setIngredientLength([...ingredientLength, newIngredient]);
+  };
+
   //Create Ingredient Bar
   const renderIngredients = useMemo(
     () =>
@@ -216,7 +224,7 @@ export default function PostScreen({navigation}) {
     () =>
       stepLength.map((item, index) => {
         return (
-          <View style={postStyle.stepBar} key={item.id.toString()}>
+          <View style={postStyle.stepBar} key={item.toString()}>
             <View style={postStyle.stepBox}>
               <Text style={{fontFamily: 'Cabin-Regular', color: '#fff'}}>
                 {index + 1}
@@ -371,7 +379,7 @@ export default function PostScreen({navigation}) {
           <Text style={postStyle.boxHeader}>Ingredients</Text>
           {renderIngredients}
           <TouchableOpacity
-            onPress={() => setIngredientLength([...ingredientLength, 3])}
+            onPress={addIngredient}
             style={postStyle.addButton}>
             <Plus name="plus" size={25} color="#51BC10" />
             <Text style={postStyle.addText}> Add Ingredient</Text>

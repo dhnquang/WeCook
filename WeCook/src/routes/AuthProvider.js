@@ -16,7 +16,15 @@ export const AuthProvider = ({children}) => {
         setUser,
         login: async (email, password) => {
           try {
-            await auth().signInWithEmailAndPassword(email, password);
+            const oldUser = await auth().signInWithEmailAndPassword(email, password);
+            firestore()
+              .collection('Users')
+              .doc(oldUser.user.uid)
+              .update({
+                Password: password,
+              })
+              .then(() => console.log('Data user set'))
+              .catch(e => console.log(e));
           } catch (e) {
             console.log(e);
             if (e.code === 'auth/invalid-email') {
@@ -40,7 +48,7 @@ export const AuthProvider = ({children}) => {
                 {
                   text: 'Understood',
                   onPress: () => console.log('user alert close'),
-                }
+                },
               ]);
             }
           }
@@ -85,7 +93,9 @@ export const AuthProvider = ({children}) => {
             );
 
             // Sign-in the user with the credential
-            const newFbUser = await auth().signInWithCredential(facebookCredential);
+            const newFbUser = await auth().signInWithCredential(
+              facebookCredential,
+            );
             console.log('newFbUser', newFbUser);
           } catch (e) {
             console.log(e);
@@ -93,7 +103,12 @@ export const AuthProvider = ({children}) => {
         },
         register: async (email, password, displayName, phoneNumber) => {
           try {
-            const newUser = await auth().createUserWithEmailAndPassword(email, password, displayName, phoneNumber);
+            const newUser = await auth().createUserWithEmailAndPassword(
+              email,
+              password,
+              displayName,
+              phoneNumber,
+            );
             console.log('newUser', newUser);
             firestore()
               .collection('Users')
@@ -131,6 +146,26 @@ export const AuthProvider = ({children}) => {
         logout: async () => {
           try {
             await auth().signOut();
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        reset: async email => {
+          try {
+            await auth()
+              .sendPasswordResetEmail(email)
+              .then(() => {
+                Alert.alert(
+                  'Reset password!',
+                  'Your password has been sent to your email',
+                ),
+                  [
+                    {
+                      text: 'Understood',
+                      onPress: () => console.log('reset password alert close'),
+                    },
+                  ];
+              });
           } catch (e) {
             console.log(e);
           }

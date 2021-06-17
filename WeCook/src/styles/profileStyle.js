@@ -17,7 +17,7 @@ export const profileStyle = StyleSheet.create({
     backgroundColor: '#B8E892',
   },
   closeIcon: {
-     flex: 1,
+    flex: 1,
     alignSelf: 'center',
     marginLeft: '2%',
   },
@@ -42,10 +42,7 @@ export const profileStyle = StyleSheet.create({
   },
   cover: {
     width: w,
-    height: h / 3,
     flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
   },
   boxIcon: {
     marginTop: '2%',
@@ -102,7 +99,7 @@ export const profileStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#51BC10'
+    borderBottomColor: '#51BC10',
   },
   changeText: {
     marginTop: '5%',
@@ -115,7 +112,7 @@ export const profileStyle = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     borderBottomColor: '#51BC10',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
   },
   infoText: {
     fontFamily: 'Cabin-Regular',
@@ -127,7 +124,7 @@ export const profileStyle = StyleSheet.create({
     fontFamily: 'Cabin-Regular',
     fontSize: 15,
   },
-   header: {
+  header: {
     backgroundColor: '#B8E892',
     shadowColor: '#333',
     shadowOffset: {
@@ -180,13 +177,36 @@ export const profileStyle = StyleSheet.create({
     color: '#fff',
   },
   imgBox: {
-    width: w/3,
-    height: w/3,
+    width: w / 3,
+    height: w / 3,
     borderWidth: 1,
-    borderColor: '#000000'
+    borderColor: '#000000',
   },
   imgPost: {
-    width: w/3,
-    height: w/3
-  }
+    width: w / 3,
+    height: w / 3,
+  },
+  logoutButton: {
+    marginTop: '10%',
+    alignSelf: 'center',
+    width: '40%',
+    height: h / 20,
+    backgroundColor: '#B8E892',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+
+    elevation: 11,
+  },
+  logoutText: {
+    fontFamily: 'Cabin-Regular',
+    fontSize: 20,
+    color: '#fff',
+  },
 });

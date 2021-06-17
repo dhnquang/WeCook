@@ -3,9 +3,9 @@ import { TouchableOpacity, Image } from 'react-native';
 
 import { profileStyle } from '../styles/profileStyle';
 
-export const ImgGrid = ({item}) => {
+export const ImgGrid = ({item, navigation}) => {
   return (
-    <TouchableOpacity style={profileStyle.imgBox}>
+    <TouchableOpacity onPress={() => navigation.navigate('DetailRecipe', {id: item.id, uID: item.uID})} style={profileStyle.imgBox}>
       <Image
         source={{uri: item.PostImage}}
         resizeMode="cover"

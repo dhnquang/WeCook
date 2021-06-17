@@ -5,39 +5,74 @@ import Like from 'react-native-vector-icons/AntDesign';
 import Save from 'react-native-vector-icons/FontAwesome';
 import Delete from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
-import firebase from '@react-native-firebase/storage';
 
 import {feedStyle} from '../styles/feedStyle';
 import {AuthContext} from '../routes/AuthProvider';
 
 export const Post = ({item, navigation, onDelete, onPress}) => {
+  const [count, setCount] = useState(0);
+  const [userLike, setUserLike] = useState([]);
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(0);
   const [saved, setSaved] = useState(false);
   const [userData, setUserData] = useState(null);
   const {user} = useContext(AuthContext);
 
-  const submitLike = () => {
-    UpdateLike();
-    // console.log(likes);
-    firestore()
+  const handleLike = () => {
+    if (userLike.includes(user.uid)) {
+      submitDisLike();
+    } else {
+      submitLike();
+    }
+  };
+
+  const submitLike = async () => {
+    await firestore()
       .collection('Posts')
       .doc(item.id)
       .update({
-        Like: likes,
+        UserLikes: firestore.FieldValue.arrayUnion(user.uid),
       })
       .then(() => {
-        console.log('User Updated');
-      });
+        console.log('user like update');
+      })
+      .catch(e => console.log(e))
+    await CountLike();
   };
 
-  const UpdateLike = () => {
-    if (liked == false) {
-      setLiked(true);
-      setLikes(likes + 1);
-    } else {
-      setLiked(false);
-      setLikes(likes - 1);
+  const submitDisLike = async () => {
+    await firestore()
+      .collection('Posts')
+      .doc(item.id)
+      .update({
+        UserLikes: firestore.FieldValue.arrayRemove(user.uid),
+      })
+      .then(() => {
+        console.log('user like remove');
+      })
+      .catch(e => console.log(e))
+    await CountLike();
+  };
+
+  const CountLike = async () => {
+    try {
+      await firestore()
+        .collection('Posts')
+        .doc(item.id)
+        .get()
+        .then(documentSnapshot => {
+          // console.log('User exists: ', documentSnapshot.exists);
+          if (documentSnapshot.exists) {
+            setUserLike(documentSnapshot.data().UserLikes);
+            setCount(documentSnapshot.data().UserLikes.length);
+          }
+        });
+      if (userLike.includes(user.uid)) {
+        setLiked(true);
+      } else {
+        setLiked(false);
+      }
+    } catch (e) {
+      console.log('Fetch user likes', e);
     }
   };
 
@@ -54,14 +89,22 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
       });
   };
 
+  // useEffect(() => {
+  //   CountLike();
+  // }, [submitDisLike, submitLike]);
+
   useEffect(() => {
     getUser();
+    CountLike();
   }, []);
 
   return (
     <TouchableOpacity
       onPress={() =>
-        navigation.navigate('DetailRecipe', {id: item.id, uID: item.uID})
+        navigation.navigate('DetailRecipe', {
+          id: item.id,
+          uID: item.uID,
+        })
       }>
       <View style={feedStyle.feedBox}>
         <Image
@@ -75,12 +118,13 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
             <Text style={feedStyle.text}>.</Text>
             <Text style={feedStyle.text}>Ration for {item.ration}</Text>
             <Text style={feedStyle.text}>.</Text>
-            <Image
-              source={require('../assets/icons/heart.png')}
-              resizeMode="contain"
+            <Like
+              name="heart"
+              size={18}
+              color="#D7443E"
               style={feedStyle.heart}
             />
-            <Text style={feedStyle.text}>{item.like}</Text>
+            <Text style={feedStyle.text}>{count}</Text>
           </View>
           <View style={feedStyle.timeBox}>
             <Text style={feedStyle.textTime}>
@@ -113,7 +157,8 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
             <Like
               name="heart"
               size={25}
-              onPress={submitLike}
+              onPress={handleLike}
+              // color={'#D7443E'}
               color={liked ? 'gray' : '#D7443E'}
             />
             <Save

@@ -12,33 +12,17 @@ import {DrawerContent} from '../components/DrawContent';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
-  return(
-    <Drawer.Navigator 
+  return (
+    <Drawer.Navigator
       initialRouteName="Home"
-      drawerContent = {props => <DrawerContent {...props}/>}
-    >
-    <Drawer.Screen
-      name="Home"
-      component={TabNavigator}
-    />
-    <Drawer.Screen
-      name="App Recipe"
-      component={AppRecipe}
-    />
-    <Drawer.Screen
-      name="About"
-      component={About}
-    />
-    <Drawer.Screen 
-      name="Setting"
-      component={Setting}
-    />
-    <Drawer.Screen 
-      name="Upload Post"
-      component={PostScreen}
-    />
-  </Drawer.Navigator>
+      drawerContent={props => <DrawerContent {...props} />}>
+      <Drawer.Screen name="Home" component={TabNavigator} />
+      <Drawer.Screen name="App Recipe" component={AppRecipe} />
+      <Drawer.Screen name="About" component={About} />
+      <Drawer.Screen name="Setting" component={Setting} />
+      <Drawer.Screen name="Upload Post" component={PostScreen} />
+    </Drawer.Navigator>
   );
-}
+};
 
 export default DrawerNavigator;

@@ -5,6 +5,7 @@ import Like from 'react-native-vector-icons/AntDesign';
 import Save from 'react-native-vector-icons/FontAwesome';
 import Delete from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
+import {useTranslation} from 'react-i18next';
 
 import {feedStyle} from '../styles/feedStyle';
 import {AuthContext} from '../routes/AuthProvider';
@@ -16,6 +17,7 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
   const [saved, setSaved] = useState(false);
   const [userData, setUserData] = useState(null);
   const {user} = useContext(AuthContext);
+  const {t} = useTranslation();
 
   const handleLike = () => {
     if (userLike.includes(user.uid)) {
@@ -23,6 +25,32 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
     } else {
       submitLike();
     }
+  };
+
+  const submitSaved = async () => {
+    await firestore()
+      .collection('Users')
+      .doc(user.uid)
+      .update({
+        SavePosts: firestore.FieldValue.arrayUnion(item.id),
+      })
+      .then(() => {
+        console.log('post save update');
+      })
+      .catch(e => console.log(e));
+  };
+
+  const submitUnSaved = async () => {
+    await firestore()
+      .collection('Users')
+      .doc(user.uid)
+      .update({
+        SavePosts: firestore.FieldValue.arrayRemove(item.id),
+      })
+      .then(() => {
+        console.log('post unsaved update');
+      })
+      .catch(e => console.log(e));
   };
 
   const submitLike = async () => {
@@ -33,10 +61,11 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
         UserLikes: firestore.FieldValue.arrayUnion(user.uid),
       })
       .then(() => {
+        // console.log(userLike)
         console.log('user like update');
       })
-      .catch(e => console.log(e))
-    await CountLike();
+      .catch(e => console.log(e));
+    CountLike();
   };
 
   const submitDisLike = async () => {
@@ -47,10 +76,11 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
         UserLikes: firestore.FieldValue.arrayRemove(user.uid),
       })
       .then(() => {
+        // console.log(userLike)
         console.log('user like remove');
       })
-      .catch(e => console.log(e))
-    await CountLike();
+      .catch(e => console.log(e));
+    CountLike();
   };
 
   const CountLike = async () => {
@@ -83,15 +113,10 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot.exists) {
-          // console.log('User Data', documentSnapshot.data());
           setUserData(documentSnapshot.data());
         }
       });
   };
-
-  // useEffect(() => {
-  //   CountLike();
-  // }, [submitDisLike, submitLike]);
 
   useEffect(() => {
     getUser();
@@ -114,9 +139,13 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
         />
         <View style={{flexDirection: 'row'}}>
           <View style={feedStyle.infoBox}>
-            <Text style={feedStyle.text}>Cooked: {item.PrepareTime} mins</Text>
+            <Text style={feedStyle.text}>
+              {t('time')}: {item.PrepareTime} mins
+            </Text>
             <Text style={feedStyle.text}>.</Text>
-            <Text style={feedStyle.text}>Ration for {item.ration}</Text>
+            <Text style={feedStyle.text}>
+              {t('ration')}: {item.ration}
+            </Text>
             <Text style={feedStyle.text}>.</Text>
             <Like
               name="heart"
@@ -132,7 +161,7 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
             </Text>
           </View>
         </View>
-        <View style={{flexDirection: 'row', marginBottom: '1%'}}>
+        <View style={feedStyle.user}>
           <TouchableOpacity onPress={onPress} style={feedStyle.avaBox}>
             <Image
               source={{
@@ -158,13 +187,12 @@ export const Post = ({item, navigation, onDelete, onPress}) => {
               name="heart"
               size={25}
               onPress={handleLike}
-              // color={'#D7443E'}
               color={liked ? 'gray' : '#D7443E'}
             />
             <Save
               name="bookmark"
               size={25}
-              onPress={() => setSaved(!saved)}
+              onPress={submitSaved}
               color={saved ? 'black' : 'gray'}
             />
             {user.uid == item.uID ? (

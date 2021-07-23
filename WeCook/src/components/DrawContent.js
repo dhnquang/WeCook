@@ -9,6 +9,7 @@ import SettingIcon from 'react-native-vector-icons/AntDesign';
 import AboutIcon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import firestore from '@react-native-firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 import {AuthContext} from '../routes/AuthProvider';
 import {drawerStyle} from '../styles/drawerStyle';
@@ -16,6 +17,7 @@ import {drawerStyle} from '../styles/drawerStyle';
 export function DrawerContent(props) {
   const {user, logout} = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
+  const {t} = useTranslation();
 
   const getUser = async () => {
     await firestore()
@@ -62,7 +64,7 @@ export function DrawerContent(props) {
           <View style={drawerStyle.drawerSection}>
             <DrawerItem
               icon={() => <HomeIcon name="home" color="#fff" size={30} />}
-              label="Home"
+              label={t('home')}
               onPress={() => {
                 props.navigation.navigate('Home');
               }}
@@ -71,30 +73,30 @@ export function DrawerContent(props) {
               icon={() => (
                 <RecipeIcon name="local-restaurant" color="#fff" size={30} />
               )}
-              label="App Recipe"
+              label={t('app')}
               onPress={() => {
-                props.navigation.navigate('App Recipe');
+                props.navigation.navigate('AppRecipe');
               }}
             />
             <DrawerItem
               icon={() => (
                 <AccountIcon name="account-circle" color="#fff" size={30} />
               )}
-              label="Account"
+              label={t('acc')}
               onPress={() => {
                 props.navigation.navigate('Profile');
               }}
             />
             <DrawerItem
               icon={() => <SettingIcon name="setting" color="#fff" size={30} />}
-              label="Setting"
+              label={t('setting')}
               onPress={() => {
                 props.navigation.navigate('Setting');
               }}
             />
             <DrawerItem
               icon={() => <AboutIcon name="info" color="#fff" size={30} />}
-              label="About"
+              label={t('about')}
               onPress={() => {
                 props.navigation.navigate('About');
               }}
@@ -105,7 +107,7 @@ export function DrawerContent(props) {
       <View style={drawerStyle.bottomDrawerSection}>
         <DrawerItem
           icon={() => <Logout name="logout" color="#fff" size={30} />}
-          label="Logout"
+          label={t('logout')}
           onPress={logout}
         />
       </View>

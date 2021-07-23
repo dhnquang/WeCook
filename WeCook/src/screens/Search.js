@@ -3,21 +3,22 @@ import {View, Text, TextInput, FlatList} from 'react-native';
 import SearchIcon from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import firestore from '@react-native-firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 import {searchStyle} from '../styles/searchStyle';
 import { SearchInfo } from '../components/SearchiInfo';
 
-export default function Search() {
+export default function Search({navigation}) {
   const [posts, setPosts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState(null);
+  const {t} = useTranslation();
 
-  // const handleSearch = (text) => {
-  //   setText(text);
-  //   // const newPosts = posts.filter(posts => posts.recipe.toLowerCase().includes(text.toLowerCase()));
-  //   // setPosts(newPosts);
-  //   // console.log(newPosts)
-  // }
+  const handleSearch = (text) => {
+    setText(text);
+    const newPosts = posts.filter(posts => posts.recipe.toLowerCase().includes(text.toLowerCase()));
+    setPosts(newPosts);
+  }
 
   const fetchPosts = async () => {
     try {
@@ -25,12 +26,12 @@ export default function Search() {
       await firestore()
         .collection('Posts')
         .orderBy('postTime', 'desc')
-        .where('Recipe', 'in', [text, text])
+        // .where('Recipe', 'in', [text, text])
         .get()
         .then(querySnapshot => {
           // console.log('Total Posts:', querySnapshot.size);
           querySnapshot.forEach(doc => {
-            const {uID, Recipe, Like, postImg, postTime, Time, Ration} = doc.data();
+            const {uID, Recipe, Ingredient, Like, postImg, postTime, Time, Ration} = doc.data();
             list.push({
               id: doc.id,
               uID,
@@ -40,6 +41,7 @@ export default function Search() {
               ration: Ration,
               like: Like,
               recipe: Recipe,
+              ingredient: Ingredient,
             });
           });
         });
@@ -52,6 +54,10 @@ export default function Search() {
       console.log('Fetch post', e);
     }
   };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [])  
 
   return (
     <View style={searchStyle.container}>
@@ -66,23 +72,22 @@ export default function Search() {
             size={25}
             color="#fff"
             style={searchStyle.searchIcon}
-            onPress={fetchPosts}
           />
           <TextInput
             style={searchStyle.inputText}
-            placeholder="Find recipes, ingredients"
+            placeholder={t('search')}
             placeholderTextColor="#fff"
-            value={text}
-            onChangeText={setText}
+            value={text !== "" ? text : fetchPosts()}
+            onChangeText={handleSearch}
           />
         </LinearGradient>
       </View>
       <View style={searchStyle.footer}>
-        <Text style={searchStyle.recentText}>Recent Search</Text>
+        <Text style={searchStyle.recentText}>{t('all')}</Text>
         <FlatList
           style={searchStyle.body}
           data={posts}
-          renderItem={({item}) => <SearchInfo item={item} />}
+          renderItem={({item}) => <SearchInfo navigation={navigation} item={item} />}
           keyExtractor={item => item.id}
         />
       </View>

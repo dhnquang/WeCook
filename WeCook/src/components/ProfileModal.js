@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Alert,
+  ToastAndroid,
 } from 'react-native';
 import Close from 'react-native-vector-icons/AntDesign';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -14,18 +14,18 @@ import Animated from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import { useTranslation } from 'react-i18next';
 
 import {profileStyle} from '../styles/profileStyle';
 import {AuthContext} from '../routes/AuthProvider';
 
 export const ProfileModal = ({navigation}) => {
   const {user, logout} = useContext(AuthContext);
-  const [uploading, setUploading] = useState(false);
-  const [transferred, setTransferred] = useState(0);
   const [image, setImage] = useState(null);
   const [userData, setUserData] = useState(null);
   const bs = React.createRef();
   const fall = new Animated.Value(1);
+  const {t} = useTranslation();
 
   const getUser = async () => {
     await firestore()
@@ -56,13 +56,13 @@ export const ProfileModal = ({navigation}) => {
         Email: userData.Email,
         Bio: userData.Bio,
         Avatar: imgUrl,
+        Phone: userData.Phone
       })
       .then(() => {
         console.log('User Updated');
-        Alert.alert(
-          'Profile Updated!',
+        ToastAndroid.show(
           'Your profile has been updated successfully',
-          [{text: 'Ok', onPress: () => console.log('alert close')}],
+          ToastAndroid.SHORT,
         );
       });
   };
@@ -80,28 +80,12 @@ export const ProfileModal = ({navigation}) => {
     const name = filename.split('.').slice(0, -1).join('.');
     filename = name + Date.now() + '.' + extension;
 
-    setUploading(true);
-    setTransferred(0);
-
     const storageRef = storage().ref(`Avatar/${filename}`);
     const task = storageRef.putFile(uploadUri);
-
-    //Set transferred state
-    task.on('state_changed', taskSnapshot => {
-      // console.log(
-      //   `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      // );
-      setTransferred(
-        Math.round(
-          (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100,
-        ),
-      );
-    });
 
     try {
       await task;
       const url = await storageRef.getDownloadURL();
-      setUploading(false);
       setImage(null);
       return url;
     } catch (e) {
@@ -144,23 +128,23 @@ export const ProfileModal = ({navigation}) => {
   const renderInner = () => (
     <View style={profileStyle.panel}>
       <View style={{alignItems: 'center'}}>
-        <Text style={profileStyle.panelTitle}>Upload Photo</Text>
-        <Text style={profileStyle.panelSubtitle}>Choose Your Photo</Text>
+        <Text style={profileStyle.panelTitle}>{t('upload')}</Text>
+        <Text style={profileStyle.panelSubtitle}>{t('choose')}</Text>
       </View>
       <TouchableOpacity
         style={profileStyle.panelButton}
         onPress={takePhotoFromCamera}>
-        <Text style={profileStyle.panelButtonTitle}>Take Photo</Text>
+        <Text style={profileStyle.panelButtonTitle}>{t('camera')}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={profileStyle.panelButton}
         onPress={choosePhotoFromLibrary}>
-        <Text style={profileStyle.panelButtonTitle}>Choose From Library</Text>
+        <Text style={profileStyle.panelButtonTitle}>{t('library')}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={profileStyle.panelButton}
         onPress={() => bs.current.snapTo(1)}>
-        <Text style={profileStyle.panelButtonTitle}>Cancel</Text>
+        <Text style={profileStyle.panelButtonTitle}>{t('cancel')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -196,7 +180,7 @@ export const ProfileModal = ({navigation}) => {
             <TouchableOpacity
               onPress={handleUpdate}
               style={profileStyle.buttonBox}>
-              <Text style={profileStyle.buttonText}>Update</Text>
+              <Text style={profileStyle.buttonText}>{t('update')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -218,12 +202,12 @@ export const ProfileModal = ({navigation}) => {
             </View>
             <TouchableOpacity onPress={() => bs.current.snapTo(0)}>
               <Text style={profileStyle.changeText}>
-                Change profile picture
+                {t('profile')}
               </Text>
             </TouchableOpacity>
           </View>
           <View style={profileStyle.infoBar}>
-            <Text style={profileStyle.infoText}> Name :</Text>
+            <Text style={profileStyle.infoText}> {t('name')}:</Text>
             <TextInput
               style={profileStyle.infoInput}
               value={userData ? userData.Name : ''}
@@ -239,15 +223,16 @@ export const ProfileModal = ({navigation}) => {
             />
           </View>
           <View style={profileStyle.infoBar}>
-            <Text style={profileStyle.infoText}> Phone:</Text>
+            <Text style={profileStyle.infoText}> {t('phone')}:</Text>
             <TextInput
               style={profileStyle.infoInput}
+              keyboardType='number-pad'
               value={userData ? userData.Phone : ''}
               onChangeText={txt => setUserData({...userData, Phone: txt})}
             />
           </View>
           <View style={profileStyle.infoBar}>
-            <Text style={profileStyle.infoText}> Signature:</Text>
+            <Text style={profileStyle.infoText}> {t('bio')}:</Text>
             <TextInput
               placeholder="Tell about yourself"
               style={profileStyle.infoInput}
@@ -256,7 +241,7 @@ export const ProfileModal = ({navigation}) => {
             />
           </View>
           <TouchableOpacity onPress={logout} style={profileStyle.logoutButton}>
-            <Text style={profileStyle.logoutText}>Logout</Text>
+            <Text style={profileStyle.logoutText}>{t('logout')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

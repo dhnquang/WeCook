@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet, Dimensions, BackHandler} from 'react-native';
 
 const w = Dimensions.get('screen').width;
 const h = Dimensions.get('screen').height;
@@ -9,13 +9,15 @@ export const searchStyle = StyleSheet.create({
   },
   headerBar: {
     width: w,
+    height: '8.5%',
     borderBottomWidth: 1,
     borderBottomColor: '#C4C4C4',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   searchBox: {
     alignSelf: 'center',
-    marginVertical: '2%',
     alignItems: 'center',
     width: '90%',
     flexDirection: 'row',
@@ -28,7 +30,7 @@ export const searchStyle = StyleSheet.create({
   },
   inputText: {
     fontFamily: 'Cabin-Regular',
-    fontSize: 15,
+    fontSize: 16,
     flex: 9,
     color: '#fff'
   },
@@ -39,7 +41,8 @@ export const searchStyle = StyleSheet.create({
     fontSize: 20,
   },
   footer: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#E3EECA'
   },
   body: {
     flex: 1,

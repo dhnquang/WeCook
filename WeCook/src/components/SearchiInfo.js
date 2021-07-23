@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, Image} from 'react-native';
 import {searchStyle} from '../styles/searchStyle';
 import firestore from '@react-native-firebase/firestore';
 
-export const SearchInfo = ({item}) => {
+export const SearchInfo = ({item, navigation}) => {
   const [userData, setUserData] = useState(null);
 
   const getUser = async () => {
@@ -24,7 +24,11 @@ export const SearchInfo = ({item}) => {
   }, []);
 
   return (
-    <TouchableOpacity style={searchStyle.searchBar}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate('DetailRecipe', {id: item.id, uID: item.uID});
+      }}
+      style={searchStyle.searchBar}>
       <Image
         source={{uri: item.PostImage}}
         resizeMode="cover"

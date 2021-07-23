@@ -6,23 +6,24 @@ const h = Dimensions.get('screen').height;
 export const feedStyle = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 60,
+    // paddingBottom: 65,
+    backgroundColor: '#E3EECA',
   },
   headerBar: {
-    alignItems:'center',
+    alignItems: 'center',
     flexDirection: 'row',
     borderBottomWidth: 1,
     width: w,
-    borderColor: '#C4C4C4',
+    height: '8%',
+    borderBottomColor: '#C4C4C4',
     backgroundColor: '#fff',
     paddingBottom: '1%',
   },
   header: {
-    fontFamily: 'Cabin-Regular',
+    fontFamily: 'Cabin-Medium',
     fontSize: 24,
     color: '#28B446',
     marginLeft: '1%',
-    alignSelf: 'center',
   },
   footer: {
     flex: 1,
@@ -38,12 +39,12 @@ export const feedStyle = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 2,
     },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
 
-    elevation: 10,
+    elevation: 6,
   },
   postImage: {
     width: '100%',
@@ -57,7 +58,7 @@ export const feedStyle = StyleSheet.create({
   },
   text: {
     fontFamily: 'Cabin-Regular',
-    fontSize: 13,
+    fontSize: 14,
     color: '#6A6666',
     marginLeft: '2%',
   },
@@ -85,8 +86,8 @@ export const feedStyle = StyleSheet.create({
     borderRadius: 25,
   },
   textBox: {
-    alignSelf: 'center', 
-    marginLeft: '3%', 
+    alignSelf: 'center',
+    marginLeft: '3%',
     flex: 5,
   },
   buttonBox: {
@@ -105,5 +106,41 @@ export const feedStyle = StyleSheet.create({
   userName: {
     fontFamily: 'Cabin-Regular',
     fontSize: 14,
+  },
+  menu: {
+    alignSelf: 'center',
+    marginLeft: '1%',
+  },
+  user: {
+    flexDirection: 'row',
+    marginBottom: '1%',
+  },
+  filterButton: {
+    width: '30%',
+    height: '75%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.44,
+    shadowRadius: 10.32,
+
+    elevation: 16,
+  },
+  filterText: {
+    fontFamily: 'Cabin-Regular',
+    fontSize: 18,
+    color: '#28B446',
+  },
+  filterView: {
+    flex: 0.1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
   },
 });

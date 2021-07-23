@@ -1,10 +1,11 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {View, Text, Image, StyleSheet, FlatList} from 'react-native';
+import {View, Text, Image, FlatList, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import EditIcon from 'react-native-vector-icons/EvilIcons';
 import Menu from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
 import {TabView, SceneMap} from 'react-native-tab-view';
+import {useTranslation} from 'react-i18next';
 
 import {profileStyle} from '../styles/profileStyle';
 import {AuthContext} from '../routes/AuthProvider';
@@ -16,6 +17,7 @@ export default function Profile({navigation, route}) {
   const [posts, setPosts] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const {t} = useTranslation();
 
   const PostRoute = () => {
     return (
@@ -34,13 +36,19 @@ export default function Profile({navigation, route}) {
   };
 
   const SaveRoute = () => {
-    return <View style={{flex: 1, backgroundColor: '#673ab7'}} />;
+    return (
+      <View style={{flex: 1}}>
+        <FlatList 
+
+        />
+      </View>
+    );
   };
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'Posts'},
-    {key: 'second', title: 'Saved'},
+    {key: 'first', title: t('posts')},
+    {key: 'second', title: t('saves')},
   ]);
 
   const renderScene = SceneMap({
@@ -149,9 +157,23 @@ export default function Profile({navigation, route}) {
           <Text style={profileStyle.username}>
             {userData ? userData.Name || 'User' : 'User'}
           </Text>
-          {/* <Text>{route.params ? route.params.uID : user.uid}</Text> */}
+          <View style={{flexDirection: 'row'}}>
+            <View style={{alignItems: 'center', marginRight: '10%'}}>
+              <Text style={profileStyle.number}>
+                {posts ? posts.length : '0'}
+              </Text>
+              <Text style={profileStyle.postText}>{t('posts')}</Text>
+            </View>
+            <TouchableOpacity style={profileStyle.messageBox}>
+              <Text style={profileStyle.messageText}>{t('mess')}</Text>
+            </TouchableOpacity>
+            <View style={{alignItems: 'center', marginLeft: '10%'}}>
+              <Text style={profileStyle.number}>0</Text>
+              <Text style={profileStyle.postText}>{t('saves')}</Text>
+            </View>
+          </View>
           <Text style={profileStyle.userBio}>
-            {userData ? userData.Bio || 'No details added.' : ''}
+            {userData ? userData.Bio || t('detail') : ''}
           </Text>
         </View>
       </LinearGradient>
@@ -163,29 +185,7 @@ export default function Profile({navigation, route}) {
           initialLayout={{width: '100%'}}
           renderTabBar={renderTabBar}
         />
-        {/* <PagerView style={styles.pagerView} initialPage={0}>
-          <View key="1">
-            <FlatList
-              data={posts}
-              renderItem={({item}) => (
-                <ImgGrid item={item} navigation={navigation} />
-              )}
-              keyExtractor={item => item.id}
-              showsVerticalScrollIndicator={false}
-              numColumns={3}
-            />
-          </View>
-          <View key="2">
-            <Text>Second page</Text>
-          </View>
-        </PagerView> */}
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  pagerView: {
-    flex: 1,
-  },
-});

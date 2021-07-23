@@ -6,6 +6,7 @@ const h = Dimensions.get('screen').height;
 export const profileStyle = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   modalContainer: {
     flex: 1,
@@ -88,11 +89,11 @@ export const profileStyle = StyleSheet.create({
   userBio: {
     fontFamily: 'Cabin-Regular',
     color: '#676767',
-    fontSize: 20,
+    fontSize: 16,
   },
   footer: {
-    flex: 1.5,
-    paddingBottom: 60,
+    flex: 1,
+    // paddingBottom: 60,
   },
   avaView: {
     marginTop: '5%',
@@ -209,4 +210,31 @@ export const profileStyle = StyleSheet.create({
     fontSize: 20,
     color: '#fff',
   },
+  number: {
+    fontFamily: 'Cabin-Bold',
+    fontSize: 24,
+  },
+  postView: {
+    alignItems: 'center',
+    marginRight: '10%',
+  },
+  messageBox: {
+    width: 80,
+    height: 35,
+    borderWidth: 2,
+    borderColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  postText: {
+    fontFamily: 'Cabin-Regular',
+    fontSize: 14,
+    color: '#676767'
+  },
+  messageText: {
+    fontFamily: 'Cabin-Regular',
+    fontSize: 16,
+    color: '#000000'
+  }
 });

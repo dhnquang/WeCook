@@ -1,5 +1,5 @@
 import React, {createContext, useState} from 'react';
-import {Alert} from 'react-native';
+import {Alert, ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
@@ -16,40 +16,46 @@ export const AuthProvider = ({children}) => {
         setUser,
         login: async (email, password) => {
           try {
-            const oldUser = await auth().signInWithEmailAndPassword(email, password);
+            const oldUser = await auth().signInWithEmailAndPassword(
+              email,
+              password,
+            );
             firestore()
               .collection('Users')
               .doc(oldUser.user.uid)
               .update({
                 Password: password,
               })
-              .then(() => console.log('Data user set'))
+              .then(() => console.log('Password user set'))
               .catch(e => console.log(e));
           } catch (e) {
             console.log(e);
             if (e.code === 'auth/invalid-email') {
-              Alert.alert('INVALID', 'Your email do not exist!', [
-                {
-                  text: 'Understood',
-                  onPress: () => console.log('email alert close'),
-                },
-              ]);
+              ToastAndroid.show('Your email do not exist', ToastAndroid.SHORT);
+              // Alert.alert('INVALID', 'Your email do not exist!', [
+              //   {
+              //     text: 'Understood',
+              //     onPress: () => console.log('email alert close'),
+              //   },
+              // ]);
             }
             if (e.code === 'auth/wrong-password') {
-              Alert.alert('OOPS!', 'Wrong password', [
-                {
-                  text: 'Understood',
-                  onPress: () => console.log('password alert close'),
-                },
-              ]);
+              ToastAndroid.show('Wrong password', ToastAndroid.SHORT);
+              // Alert.alert('OOPS!', 'Wrong password', [
+              //   {
+              //     text: 'Understood',
+              //     onPress: () => console.log('password alert close'),
+              //   },
+              // ]);
             }
             if (e.code === 'auth/user-not-found') {
-              Alert.alert('OOPS!', 'User not found', [
-                {
-                  text: 'Understood',
-                  onPress: () => console.log('user alert close'),
-                },
-              ]);
+              ToastAndroid.show('User not found', ToastAndroid.SHORT);
+              // Alert.alert('OOPS!', 'User not found', [
+              //   {
+              //     text: 'Understood',
+              //     onPress: () => console.log('user alert close'),
+              //   },
+              // ]);
             }
           }
         },
@@ -63,7 +69,25 @@ export const AuthProvider = ({children}) => {
               auth.GoogleAuthProvider.credential(idToken);
 
             // Sign-in the user with the credential
-            await auth().signInWithCredential(googleCredential);
+            const newGoogleUser = await auth().signInWithCredential(
+              googleCredential,
+            );
+            console.log('New google user', newGoogleUser);
+            if (newGoogleUser.additionalUserInfo.isNewUser == true) {
+              firestore()
+                .collection('Users')
+                .doc(newGoogleUser.user.uid)
+                .set({
+                  Name: newGoogleUser.additionalUserInfo.profile.given_name,
+                  Email: newGoogleUser.additionalUserInfo.profile.email,
+                  Password: null,
+                  Phone: null,
+                  Avatar: newGoogleUser.additionalUserInfo.profile.picture,
+                  Bio: null,
+                })
+                .then(() => console.log('Data Google user set'))
+                .catch(e => console.log('set data failed', e));
+            }
           } catch (e) {
             console.log(e);
           }
@@ -96,7 +120,22 @@ export const AuthProvider = ({children}) => {
             const newFbUser = await auth().signInWithCredential(
               facebookCredential,
             );
-            console.log('newFbUser', newFbUser);
+            console.log('newFbUser', newFbUser.additionalUserInfo.profile.name);
+            if (newFbUser.additionalUserInfo.isNewUser == true) {
+              firestore()
+                .collection('Users')
+                .doc(newFbUser.user.uid)
+                .set({
+                  Name: newFbUser.additionalUserInfo.profile.name,
+                  Email: newFbUser.additionalUserInfo.profile.email,
+                  Password: null,
+                  Phone: null,
+                  Avatar: newFbUser.additionalUserInfo.profile.picture.data.url,
+                  Bio: null,
+                })
+                .then(() => console.log('Data FB user set'))
+                .catch(e => console.log('set data failed', e));
+            }
           } catch (e) {
             console.log(e);
           }
@@ -125,21 +164,17 @@ export const AuthProvider = ({children}) => {
               .catch(e => console.log(e));
           } catch (e) {
             if (e.code === 'auth/email-already-in-use') {
-              Alert.alert('INVALID', 'That email address is already in use!', [
-                {
-                  text: 'Understood',
-                  onPress: () => console.log('email register alert close'),
-                },
-              ]);
+              ToastAndroid.show(
+                'That email address is already in use',
+                ToastAndroid.SHORT,
+              );
             }
 
             if (e.code === 'auth/invalid-email') {
-              Alert.alert('INVALID', 'That email address is invalid!', [
-                {
-                  text: 'Understood',
-                  onPress: () => console.log('email register alert close'),
-                },
-              ]);
+              ToastAndroid.show(
+                'That email address is invalid',
+                ToastAndroid.SHORT,
+              );
             }
           }
         },

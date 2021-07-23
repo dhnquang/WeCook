@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect, useContext} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -6,20 +6,23 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
-import Animated from 'react-native-reanimated';
+import Animated, {set} from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import Close from 'react-native-vector-icons/AntDesign';
 import Plus from 'react-native-vector-icons/AntDesign';
 import Minus from 'react-native-vector-icons/AntDesign';
+import { useTranslation } from 'react-i18next';
 
 import {postStyle} from '../styles/postStyle';
 import {AuthContext} from '../routes/AuthProvider';
+import AddIngredient from '../components/AddIngredient';
+import AddStep from '../components/AddStep';
 
 export default function PostScreen({navigation}) {
   const bs = React.createRef();
@@ -32,12 +35,13 @@ export default function PostScreen({navigation}) {
   const [ration, setRation] = useState(0);
   const [recipe, setRecipe] = useState('');
   const [description, setDescription] = useState('');
-  const [time, setTime] = useState();
-  const [ingredient, setIngredient] = useState('');
-  const [steps, setSteps] = useState('');
-  const [quantity, setQuantity] = useState(0);
+  const [time, setTime] = useState('');
+  const [ingredient, setIngredient] = useState(null);
+  const [steps, setSteps] = useState(null);
+  const [quantity1, setQuantity1] = useState(null);
 
   const {user} = useContext(AuthContext);
+  const {t} = useTranslation();
 
   const Decremental = () => {
     if (ration >= 1) {
@@ -45,25 +49,22 @@ export default function PostScreen({navigation}) {
     }
   };
 
-  const [ingredientLength, setIngredientLength] = useState([1, 2]);
-  const [stepLength, setStepLength] = useState([1, 2])
-  //   {
-  //     id: 1,
-  //     detail: 'Cook',
-  //     img: null,
-  //   },
-  //   {
-  //     id: 2,
-  //     detail: 'test',
-  //     img: null,
-  //   },
-  // ]);
+  const handleCallback = (childData, childQuantity) => {
+    setIngredient(childData);
+    setQuantity1(childQuantity);
+  };
 
+  const handleCallback2 = childData => {
+    setSteps(childData);
+  };
+  console.log(steps);
+  console.log(ingredient);
+  console.log(quantity1);
   //Use photo and camera
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
       width: 400,
-      height: 230,
+      height: 260,
       cropping: true,
     }).then(image => {
       console.log(image);
@@ -74,13 +75,31 @@ export default function PostScreen({navigation}) {
   const choosePhotoFromLibrary = () => {
     ImagePicker.openPicker({
       width: 400,
-      height: 230,
+      height: 260,
       cropping: true,
     }).then(image => {
       console.log(image);
       setImage(image.path);
     });
     bs.current.snapTo(1);
+  };
+
+  const checkPost = () => {
+    if (
+      image ==
+        'https://firebasestorage.googleapis.com/v0/b/wecook-5ab29.appspot.com/o/BackGround%2FbackgroundPhoto.png?alt=media&token=553cac82-1f00-4de0-8565-05044ee92731' ||
+      recipe.length == 0 ||
+      ration == 0 ||
+      time.length == 0 ||
+      ingredient == null ||
+      quantity1 == null ||
+      steps == null
+    ) {
+      ToastAndroid.show('Missing information', ToastAndroid.SHORT);
+      setUploading(false);
+    } else {
+      submitPost;
+    }
   };
 
   // Submit Post
@@ -96,6 +115,9 @@ export default function PostScreen({navigation}) {
         postTime: firestore.Timestamp.fromDate(new Date()),
         Ration: ration,
         Time: time,
+        Ingredient: ingredient,
+        IngredientQuantity: quantity1,
+        Step: steps,
         uID: user.uid,
         Like: 0,
         Comment: 0,
@@ -103,10 +125,9 @@ export default function PostScreen({navigation}) {
       })
       .then(() => {
         console.log('Data post set');
-        Alert.alert(
-          'Successfully!',
-          'Your post has been uploaded successfully',
-          [{text: 'Ok', onPress: () => console.log('alert close')}],
+        ToastAndroid.show(
+          t('postNotification'),
+          ToastAndroid.SHORT,
         );
         navigation.navigate('NewFeed');
         setImage(
@@ -161,123 +182,27 @@ export default function PostScreen({navigation}) {
     }
   };
 
-  const removeIngredient = item => () => {
-    // console.log(item);
-    const newIngredientLength = ingredientLength.filter(
-      ingredientLength => ingredientLength != item,
-    );
-    // console.log(newIngredientLength);
-    setIngredientLength(newIngredientLength);
-  };
-
-  const addIngredient = () => {
-    const newIngredient = ingredientLength[ingredientLength.length - 1] + 1;
-    // console.log('aaa', newStep);
-    setIngredientLength([...ingredientLength, newIngredient]);
-  };
-
-  //Create Ingredient Bar
-  const renderIngredients = useMemo(
-    () =>
-      ingredientLength.map(item => {
-        return (
-          <View style={postStyle.ingredientBar} key={item.toString()}>
-            <Close
-              name="close"
-              size={30}
-              color="#51BC10"
-              onPress={removeIngredient(item)}
-            />
-            <TextInput
-              placeholder="Ingredient"
-              style={postStyle.inputIngredient}
-              // value={ingredient}
-              // onChangeText={setIngredient}
-            />
-            <View style={postStyle.boxQuantity}>
-              <TextInput
-                placeholder="Quantity"
-                placeholderTextColor="#fff"
-                style={postStyle.inputQuantity}
-              />
-            </View>
-          </View>
-        );
-      }),
-    [ingredientLength],
-  );
-
-  const removeStep = item => () => {
-    // console.log(item);
-    const newStepLength = stepLength.filter(stepLength => stepLength != item);
-    // console.log(newStepLength);
-    setStepLength(newStepLength);
-  };
-
-  const addStep = () => {
-    const newStep = stepLength[stepLength.length - 1] + 1;
-    // console.log('aaa', newStep);
-    setStepLength([...stepLength, newStep]);
-  };
-  //Create Step Bar
-  const renderSteps = useMemo(
-    () =>
-      stepLength.map((item, index) => {
-        return (
-          <View style={postStyle.stepBar} key={item.toString()}>
-            <View style={postStyle.stepBox}>
-              <Text style={{fontFamily: 'Cabin-Regular', color: '#fff'}}>
-                {index + 1}
-              </Text>
-            </View>
-            <View style={{width: '80%', marginRight: '2%', marginLeft: '2%'}}>
-              <TextInput
-                placeholder="Step..."
-                multiline
-                numberOfLines={2}
-                style={postStyle.inputStep}
-              />
-              <TouchableOpacity
-                style={{
-                  marginTop: '2%',
-                  width: 120,
-                  height: 120,
-                  backgroundColor: '#C4C4C4',
-                }}></TouchableOpacity>
-            </View>
-            <Close
-              name="close"
-              size={25}
-              color="#51BC10"
-              onPress={removeStep(item)}
-            />
-          </View>
-        );
-      }),
-    [stepLength],
-  );
-
   //Create Bottom Sheet
   const renderInner = () => (
     <View style={postStyle.panel}>
       <View style={{alignItems: 'center'}}>
-        <Text style={postStyle.panelTitle}>Upload Photo</Text>
-        <Text style={postStyle.panelSubtitle}>Choose Your Photo</Text>
+        <Text style={postStyle.panelTitle}>{t('upload')}</Text>
+        <Text style={postStyle.panelSubtitle}>{t('choose')}</Text>
       </View>
       <TouchableOpacity
         style={postStyle.panelButton}
         onPress={takePhotoFromCamera}>
-        <Text style={postStyle.panelButtonTitle}>Take Photo</Text>
+        <Text style={postStyle.panelButtonTitle}>{t('camera')}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={postStyle.panelButton}
         onPress={choosePhotoFromLibrary}>
-        <Text style={postStyle.panelButtonTitle}>Choose From Library</Text>
+        <Text style={postStyle.panelButtonTitle}>{t('library')}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={postStyle.panelButton}
         onPress={() => bs.current.snapTo(1)}>
-        <Text style={postStyle.panelButtonTitle}>Cancel</Text>
+        <Text style={postStyle.panelButtonTitle}>{t('cancel')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -312,11 +237,11 @@ export default function PostScreen({navigation}) {
           {uploading ? (
             <View style={postStyle.uploadBox}>
               <ActivityIndicator size="large" color="#fff" />
-              <Text>{transferred} % Completed!</Text>
+              <Text>{transferred} % {t('complete')}</Text>
             </View>
           ) : (
-            <TouchableOpacity onPress={submitPost} style={postStyle.buttonBox}>
-              <Text style={postStyle.buttonText}>Recipe</Text>
+            <TouchableOpacity onPress={checkPost} style={postStyle.buttonBox}>
+              <Text style={postStyle.buttonText}>{t('post')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -332,7 +257,7 @@ export default function PostScreen({navigation}) {
           </TouchableOpacity>
           <View style={postStyle.boxName}>
             <TextInput
-              placeholder="Recipe name"
+              placeholder={t('recipe')}
               placeholderTextColor="#000000"
               style={postStyle.inputName}
               value={recipe}
@@ -340,7 +265,7 @@ export default function PostScreen({navigation}) {
             />
           </View>
           <View style={postStyle.boxDescribe}>
-            <Text style={postStyle.inputDescribe}>Describe your dish</Text>
+            <Text style={postStyle.inputDescribe}>{t('describe')}</Text>
             <TextInput
               multiline
               numberOfLines={2}
@@ -350,7 +275,7 @@ export default function PostScreen({navigation}) {
             />
           </View>
           <View style={postStyle.boxRation}>
-            <Text style={postStyle.textRation}>Ration</Text>
+            <Text style={postStyle.textRation}>{t('ration')}</Text>
             <View style={postStyle.buttonRation}>
               <TouchableOpacity onPress={Decremental}>
                 <Minus name="minus" size={18} />
@@ -362,37 +287,21 @@ export default function PostScreen({navigation}) {
             </View>
           </View>
           <View style={postStyle.boxPrepare}>
-            <Text style={postStyle.textRation}>Ready in</Text>
+            <Text style={postStyle.textRation}>{t('prepare')}</Text>
             <View style={postStyle.boxTime}>
               <TextInput
-                placeholder="time"
+                placeholder={t('times')}
                 style={postStyle.inputTime}
                 keyboardType="numeric"
                 value={time}
                 onChangeText={setTime}
               />
-              <Text style={postStyle.textTime}>minutes</Text>
+              <Text style={postStyle.textTime}>{t('minute')}</Text>
             </View>
           </View>
         </View>
-        <View style={postStyle.box2}>
-          <Text style={postStyle.boxHeader}>Ingredients</Text>
-          {renderIngredients}
-          <TouchableOpacity
-            onPress={addIngredient}
-            style={postStyle.addButton}>
-            <Plus name="plus" size={25} color="#51BC10" />
-            <Text style={postStyle.addText}> Add Ingredient</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={postStyle.box3}>
-          <Text style={postStyle.boxHeader}>Steps</Text>
-          {renderSteps}
-          <TouchableOpacity onPress={addStep} style={postStyle.addButton}>
-            <Plus name="plus" size={25} color="#51BC10" />
-            <Text style={postStyle.addText}> Add Step</Text>
-          </TouchableOpacity>
-        </View>
+        <AddIngredient parentCallback={handleCallback} />
+        <AddStep parentCallback={handleCallback2} />
       </ScrollView>
     </View>
   );

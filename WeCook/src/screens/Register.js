@@ -45,10 +45,10 @@ export default function Register({navigation}) {
 
   const checkRegister = () => {
     if (
-      email.length == 0 &&
-      password.length == 0 &&
-      name.length == 0 &&
-      cfPassword.length == 0 &&
+      email.length == 0 ||
+      password.length == 0 ||
+      name.length == 0 ||
+      cfPassword.length == 0 ||
       phone.length == 0
     ) {
       Alert.alert('OOPS!', 'Missing information', [

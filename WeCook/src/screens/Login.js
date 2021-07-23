@@ -21,7 +21,7 @@ export default function Login({navigation}) {
   const [password, setPassword] = useState('');
 
   const checkLogin = () => {
-    if(email.length == 0 && password.length == 0) {
+    if(email.length == 0 || password.length == 0) {
       Alert.alert('OOPS!', 'Type email and password', [
         {text: 'Understood', onPress: () => console.log('alert close')},
       ]);

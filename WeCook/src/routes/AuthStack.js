@@ -2,7 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
-import Splash from '../screens/Splash';
+// import Splash from '../screens/Splash';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 
@@ -14,8 +14,8 @@ GoogleSignin.configure({
 });
 
 const AuthStack = () => (
-  <Stack.Navigator initialRouteName="Splash" headerMode="none">
-    <Stack.Screen name="Splash" component={Splash} />
+  <Stack.Navigator initialRouteName="Login" headerMode="none">
+    {/* <Stack.Screen name="Splash" component={Splash} /> */}
     <Stack.Screen name="Login" component={Login} />
     <Stack.Screen name="Register" component={Register} />
   </Stack.Navigator>

@@ -49,7 +49,7 @@ export const postStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: w,
-    height: h / 3.5,
+    height: h / 3,
   },
   header: {
     backgroundColor: '#B8E892',
@@ -191,7 +191,7 @@ export const postStyle = StyleSheet.create({
     flexDirection: 'row',
   },
   inputIngredient: {
-    width: '60%',
+    width: '65%',
     borderBottomColor: '#51BC10',
     borderBottomWidth: 1,
     marginLeft: '2%',
@@ -221,6 +221,7 @@ export const postStyle = StyleSheet.create({
     fontSize: 16,
   },
   box3: {
+    paddingBottom: '1%',
     width: w,
     backgroundColor: '#fff',
     marginTop: '2%',
@@ -253,5 +254,23 @@ export const postStyle = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-end',
     marginRight: '5%',
+  },
+  index: {
+    fontFamily: 'Cabin-Regular',
+    color: '#fff',
+  },
+  addInput: {
+    width: '80%',
+    marginRight: '2%',
+    marginLeft: '2%',
+  },
+  submit: {
+    fontFamily: 'Cabin-Regular',
+    fontSize: 16,
+    color: '#51BC10',
+  },
+  button: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
 });
